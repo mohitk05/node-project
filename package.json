@@ -1,10 +1,14 @@
 {
   "name": "node-project",
   "version": "1.0.0",
+  "engines": {
+    "node": "6.9.1",
+    "npm": "3.10.8"
+  },
   "description": "contributions",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "author": "Mohit",
   "license": "ISC",
