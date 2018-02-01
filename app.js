@@ -6,7 +6,12 @@ var pretty = require('express-prettify');
 var app = express();
 //Connect to MongoDB
 var mongoose = require('mongoose');
-var mongoDB = 'mongodb://localhost:27017/data';
+var mongoDB = '';
+if(process.env.NODE_ENV === 'production'){
+  mongoDB = 'mongodb://admin:admin@ds221258.mlab.com:21258/node-project-db';
+} else {
+  mongoDB = 'mongodb://localhost:27017/data';
+}
 mongoose.connect(mongoDB, {
   useMongoClient: true
 });
