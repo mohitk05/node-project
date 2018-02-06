@@ -8,7 +8,7 @@ exports.index = function(req, res){
 //Add a node GET
 exports.add_node_get = function(req, res){
   console.log(req.query);
-  
+
   var new_node = new TreeNode({data: {title: '', body: req.query.body}, children: [], headNode: req.query.headnode});
   new_node.save(function(err, new_node){
     if(err) throw err;
@@ -39,7 +39,7 @@ exports.get_all_nodes = function(req, res){
 exports.get_node = function(req, res){
   console.log('in get');
   TreeNode
-    .findOne({'data.body': req.params.id})
+    .findOne({'_id': req.params.id})
     .exec(function(err, node){
     if(err) {return next(err);}
     res.send(node);
