@@ -1,7 +1,7 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
-var pretty = require('express-prettify');
+//var pretty = require('express-prettify');
 
 var app = express();
 //Connect to MongoDB
@@ -10,7 +10,7 @@ var mongoDB = '';
 if(process.env.NODE_ENV === 'production'){
   mongoDB = 'mongodb://admin:admin@ds221258.mlab.com:21258/node-project-db';
 } else {
-  mongoDB = 'mongodb://localhost:27017/data';
+  mongoDB = 'mongodb://admin:admin@ds221258.mlab.com:21258/node-project-db';
 }
 mongoose.connect(mongoDB, {
   useMongoClient: true
@@ -20,7 +20,6 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 //Routes import
-var index = require('./routes/index');
 var catalog = require('./routes/catalog');
 
 //Middleware
@@ -33,10 +32,9 @@ app.use(function (req, res, next) {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(pretty({ query: 'pretty' }));
+//app.use(pretty({ query: 'pretty' }));
 
-app.use('/', index);
-app.use('/catalog', catalog);
+app.use('/', catalog);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
