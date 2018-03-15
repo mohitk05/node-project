@@ -1,41 +1,38 @@
-var TreeNode = require('../models/treenodemodel');
+exports.sortStory = function(storyArray){
+  //console.log(storyArray);
+  var versions = {};
+  var stack = [];
+  var root = storyArray[0];
+  //console.log(storyArray.find(el => el._id.toString() === root._id.toString()));
+  var current_node = root;
+  stack.push(current_node._id);
+  recursiveDFS(storyArray.slice(), versions, stack, current_node._id,1);
+  return versions;
+}
 
-var queue = {
-  q: [],
-  enqueue: function(obj){
-    this.q.push(obj);
-  },
-  dequeue: function(){
-    var obj = this.q[0];
-    this.q.slice(1);
-    return obj;
-  },
-  isEmpty: function(){
-    return !this.q.length;
+var recursiveDFS = function(arr, versions, stack, cnode, iter){
+  var terminate = false;
+  var node = getNodeFromId(arr, cnode);
+  //console.log('Node from id:',node);
+  while(node.children.length>0 && !terminate){
+    stack.push(node.children.shift());
+    if(versions[iter] === undefined){versions[iter] = arr[0]._id}
+    versions[iter] += '$' + stack[stack.length-1];
+    node = getNodeFromId(arr, stack[stack.length-1]);
   }
-}
-
-exports.insertNode = function(story, parent, node){
-  var curr_node = story.headNode;
-  console.log(curr_node);
-  searchFor(curr_node, parent, node);
-}
-
-var searchFor = function(cn, parent, node){
-  if(cn._id === parent._id){
-    saveToMongo(cn, node);
-    return true;
+  stack.pop();
+  //console.log('Outside while');
+  if(stack.length === 0){
+    terminate = true;
+    return;
   } else{
-    TreeNode.findOne({"_id": parent.id}).exec((err, c_node) => {
-      c_node.children.forEach((child) => {
-        queue.enqueue(child);
-      })
-      searchFor(queue.dequeue(), parent, node);
-      return;
-    });
+    iter = iter + 1;
+    recursiveDFS(arr, versions, stack, stack.slice(stack.length-1,stack.length)[0], iter);
   }
+
 }
 
-var saveToMongo = function(cn, node){
-  TreeNode.update({'_id':cn._id}, {$push: {children: node}}, function(err, updated_parent){console.log('Update successfull');});
+var getNodeFromId = function(arr, id){
+  //console.log(arr, id);
+  return arr.find((obj) => obj._id.toString() === id.toString());
 }

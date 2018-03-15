@@ -1,5 +1,6 @@
 var Story = require('../models/storymodel');
 var TreeNode = require('../models/treenodemodel');
+var storyStruc =  require('./story.js');
 
 exports.create_story_post = function(req, res){
   var new_head_node = new TreeNode({data: {title: '', body: req.body.body}, children: [], parent: null, storyId: null, depth: 0, version: 0});
@@ -19,7 +20,7 @@ exports.create_story_post = function(req, res){
 exports.get_story = function(req, res){
   TreeNode.find({"storyId":req.params.id}).sort({"depth":1,"version":1})
     .exec((err, result) => {
-      res.send(result);
+      res.send(storyStruc.sortStory(result));
     })
 }
 
