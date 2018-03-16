@@ -1,9 +1,7 @@
 exports.sortStory = function(storyArray){
-  //console.log(storyArray);
   var versions = {};
   var stack = [];
   var root = storyArray[0];
-  //console.log(storyArray.find(el => el._id.toString() === root._id.toString()));
   var current_node = root;
   stack.push(current_node._id);
   recursiveDFS(storyArray.slice(), versions, stack, current_node._id,1);
@@ -18,9 +16,15 @@ var recursiveDFS = function(arr, versions, stack, cnode, iter){
     stack.push(node.children.shift());
     if(versions[iter] === undefined){versions[iter] = arr[0]._id}
     versions[iter] += '$' + stack[stack.length-1];
+    //console.log(versions);
     node = getNodeFromId(arr, stack[stack.length-1]);
   }
-  stack.pop();
+  //console.log(getNodeFromId(arr, stack[stack.length-1]).children);
+  var hasChildren = true;
+  //while(hasChildren){
+  //  getNodeFromId(arr, stack[stack.length-1]).children.length
+    stack.pop();
+  //}
   //console.log('Outside while');
   if(stack.length === 0){
     terminate = true;

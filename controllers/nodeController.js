@@ -6,46 +6,47 @@ exports.index = function(req, res){
 }
 
 //Add a node POST
-exports.add_node_post = function(req, res){
-  TreeNode.findOne({"_id":req.body.parentId})
-    .exec((err, node_parent) => {
-      if(err) throw err;
-      var new_node = new TreeNode({data: {title: '', body: req.body.body}, children: [], parent: req.body.parentId, depth: node_parent.depth+1,version: node_parent.children.length, storyId: node_parent.storyId});
-      new_node.save(function(err, new_node){
-        if(err) throw err;
-        TreeNode.update({"_id": req.body.parentId}, {$push: {children: new_node}}, function(err, updated_parent){
-          res.send(new_node);
-        });
-    })
-  });
+exports.add_node_post = async function(req, res, next){
+  try{
+    const node_parent = await TreeNode.findOne({'_id':req.body.parentId}).exec();
+    const new_node = new TreeNode({data: {title: '', body: req.body.body}, children: [], parent: req.body.parentId, depth: node_parent.depth+1,version: node_parent.children.length, storyId: node_parent.storyId});
+    const saved_node = await new_node.save();
+    await TreeNode.update({"_id": req.body.parentId}, {$push: {children: new_node}});
+    res.send(saved_node);
+  } catch(err){
+    next(err);
+  }
 }
 
 //Get all nodes
-exports.get_all_nodes = function(req, res){
-  TreeNode
-    .find()
-    .exec(function(err, nodes){
-      if(err) throw err;
-      res.send(nodes);
-    })
+exports.get_all_nodes = async function(req, res, next){
+  try{
+    const nodes = await TreeNode.find().exec();
+    res.send(nodes);
+  } catch(err) {
+    next(err);
+  }
 }
 
 //Get a node
-exports.get_node = function(req, res){
-  TreeNode
-    .findOne({'_id': req.params.id})
-    .exec(function(err, node){
-      if(err) throw err;
-      res.send(node);
-  });
+exports.get_node = async function(req, res, next){
+  try{
+    const node = await TreeNode.findOne({'_id': req.params.id}).exec();
+    res.send(node);
+  } catch(err){
+    next(err);
+  }
 }
 
 //Update a node POST
-exports.update_node_post = function(req, res){
-  TreeNode.update({"_id":req.body.nodeId},{"data.body":req.body.newBody}, (err) => {
-    if(err) throw err;
-    TreeNode.findOne({"_id":req.body.nodeId}).exec((err, node) => {res.send(node);});
-  })
+exports.update_node_post = async function(req, res){
+  try{
+    await TreeNode.update({"_id":req.body.nodeId},{"data.body":req.body.newBody});
+    const updated_node = await TreeNode.findOne({"_id":req.body.nodeId}).exec();
+    res.send(updated_node);
+  } catch(err){
+    next(err);
+  }
 }
 
 //Delete a node POST
